@@ -7,4 +7,8 @@ package com.lin.vo;
  * @modyified By:
  */
 public class TestVo {
+
+    public static void main(String[] args) {
+        System.out.println("1");
+    }
 }
