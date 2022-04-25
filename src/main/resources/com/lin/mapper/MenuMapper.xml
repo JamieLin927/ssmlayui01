@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lin.mapper.MenuMapper">
+
+
+    <select id="findallmenu" resultType="menu">
+        SELECT DISTINCT m.* FROM menu m
+INNER JOIN t_role_menu rm ON rm.menu_id=m.id
+INNER JOIN t_user_role ur ON ur.role_id=rm.role_id
+WHERE ur.user_id=#{userid} ORDER BY m.id
+    </select>
+
+</mapper>

@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lin.mapper.UserMapper">
+    <resultMap id="BaseMap" type="com.lin.vo.UserVo">
+        <id property="id" column="id"/>
+        <result property="userName" column="user_name"/>
+        <result property="trueName" column="true_name"/>
+        <result property="email" column="email"/>
+        <result property="phone" column="phone"/>
+        <result property="deptId" column="dept_id"/>
+        <result property="userPwd" column="user_pwd"/>
+    </resultMap>
+
+    <resultMap id="userAndDeptName" type="com.lin.vo.UserVo" extends="BaseMap" >
+        <association property="dept" javaType="com.lin.entity.Dept">
+            <result property="deptName" column="dept_name"/>
+        </association>
+    </resultMap>
+
+
+    <delete id="deleteuserRole">
+
+        delete from t_user_role where user_id=#{userId} and role_id=#{roleId}
+    </delete>
+
+
+    <!--    查询用户-->
+    <select id="findAllUser" resultType="user">
+        SELECT *  FROM t_user
+        <where>
+            is_valid=0
+
+            <if test="userName!=null and userName!=''">
+               and user_name like concat('%',#{userName},'%')
+            </if>
+        </where>
+    </select>
+
+
+    <select id="finduseranddeptname" resultMap="userAndDeptName">
+        SELECT u.*,d.dept_name FROM t_user u,t_dept d
+        <where>
+            u.is_valid=0 AND u.dept_id= d.id
+            <if test="userName!=null and userName!=''">
+                and user_name like concat('%',#{userName},'%')
+            </if>
+            <if test="deptId!=null and deptId!=''">
+                and dept_id = #{deptId}
+            </if>
+
+        </where>
+
+    </select>
+
+
+<!--    用户登录-->
+    <select id="login" resultType="user" >
+        select  * from t_user where user_name=#{userName} and user_pwd=#{userPwd}
+    </select>
+
+<!--    添加用户-->
+    <insert id="insertuser" >
+        INSERT INTO t_user (user_name,user_pwd,dept_id,true_name,email,phone) VALUE (#{userName},#{userPwd},#{deptId},#{trueName},#{email},#{phone})
+    </insert>
+
+
+    <insert id="adduserRole">
+   INSERT INTO `t_user_role` (`user_id`,`role_id`)VALUE(#{userId},#{roleId})
+    </insert>
+
+
+    <!--    批量删除-->
+    <update id="deleteByids">
+        update  t_user set is_valid=1
+        <where>
+            id
+            <foreach collection="ids" open="in (" close=")" separator="," item="id">
+                #{id}
+            </foreach>
+        </where>
+    </update>
+
+<!--    删除单条数据-->
+    <update id="deleteByid">
+        update  t_user set is_valid=1 where id=#{id}
+    </update>
+
+<!--    修改用户信息-->
+    <update id="updateuser">
+        update t_user set `user_name`=#{userName},`user_pwd`=#{userPwd},`true_name`=#{trueName}, `email`=#{email},`phone`=#{phone}   where id=#{id}
+    </update>
+</mapper>

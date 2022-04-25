@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lin.mapper.RoleMapper">
+  <resultMap id="BaseResultMap" type="com.lin.entity.Role">
+    <constructor>
+      <idArg column="id" javaType="java.lang.Integer" jdbcType="INTEGER" />
+      <arg column="role_name" javaType="java.lang.String" jdbcType="VARCHAR" />
+      <arg column="role_remark" javaType="java.lang.String" jdbcType="VARCHAR" />
+      <arg column="is_valid" javaType="java.lang.Integer" jdbcType="INTEGER" />
+      <arg column="create_date" javaType="java.util.Date" jdbcType="TIMESTAMP" />
+      <arg column="update_date" javaType="java.util.Date" jdbcType="TIMESTAMP" />
+    </constructor>
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, role_name, role_remark, is_valid, create_date, update_date
+  </sql>
+
+<!--  授权时删除角色的菜单权限信息-->
+  <delete id="deleterolemenu">
+    delete from `t_role_menu` where `role_id`=#{roleId}
+  </delete>
+
+<!--  查询所有角色信息-->
+  <select id="findallRole" resultType="com.lin.entity.Role">
+     select  * from t_role
+     <where>
+    is_valid=0
+    <if test="roleName!=null and roleName!=''">
+      and role_name like concat('%',#{roleName},'%')
+    </if>
+  </where>
+  </select>
+
+<!--  添加角色-->
+  <insert id="insertRole">
+INSERT INTO t_role(role_name,role_remark ) VALUE (#{roleName},#{roleRemark})
+</insert>
+
+<!--  添加角色菜单权限信息-->
+  <insert id="authrolemenu">
+    INSERT INTO `t_role_menu` (`role_id`,`menu_id`)VALUE(#{roleId},#{menuId})
+  </insert>
+
+<!--  修改角色信息-->
+  <update id="updateRole">
+update t_role set role_name=#{roleName},role_remark=#{roleRemark} where id=#{id}
+  </update>
+
+<!--  批量删除角色信息-->
+  <update id="deleteRoleByIds" >
+    update  t_role set is_valid=1
+    <where>
+      id
+      <foreach collection="ids" item="id"  open="in ("  close=")" separator=",">
+        #{id}
+      </foreach>
+    </where>
+  </update>
+
+<!--  通过id删除角色信息-->
+  <update id="deleteRoleById">
+update  t_role set is_valid=1 where id=#{id}
+  </update>
+
+<!--  新增角色时检测角色名称是否存在-->
+  <select id="checkName" resultType="role">
+    select * from t_role where is_valid=0 and role_name=#{rolename}
+  </select>
+
+<!--  初始化角色权限信息-->
+    <select id="initroleMenu" resultType="com.lin.entity.Menu">
+      select  * from menu
+    </select>
+
+<!--  通过角色id查询该角色下有哪些权限，封装到tree中-->
+  <select id="findroleMenuByrid" resultType="java.lang.Integer">
+    select  menu_id from t_role_menu where role_id=#{roleId}
+  </select>
+
+<!--  获取所有的角色信息以便给用户分配角色-->
+  <select id="getallrole" resultType="com.lin.entity.Role">
+     select * from t_role where is_valid=0
+  </select>
+
+<!--  通过用户id获取角色信息-->
+  <select id="getroleByuId" resultType="role">
+    SELECT r.* FROM t_role r,`t_user_role` ur
+WHERE ur.role_id=r.id AND ur.user_id=#{userId}
+  </select>
+
+
+</mapper>

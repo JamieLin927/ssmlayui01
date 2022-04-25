@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lin.mapper.DeptMapper">
+
+<!--    查询用户-->
+    <select id="initallDept" resultType="dept">
+        select  * from t_dept
+        <where>
+            is_valid=0
+        </where>
+    </select>
+
+    <select id="findallDept" resultType="dept">
+        select  * from t_dept
+        <where>
+            is_valid=0
+            <if test="deptName!=null and deptName!=''">
+                and dept_name like concat  ('%',#{deptName},'%')
+            </if>
+        </where>
+    </select>
+
+    <insert id="adddept" >
+       insert into t_dept (dept_name,dept_add,remark) value(#{deptName},#{deptAdd},#{remark})
+    </insert>
+
+
+    <!--    批量删除-->
+    <update id="deleteByids">
+        update  t_dept set is_valid=1
+        <where>
+            id
+            <foreach collection="ids" open="in (" close=")" separator="," item="id">
+                #{id}
+            </foreach>
+        </where>
+    </update>
+
+
+    <!--    删除单条数据-->
+    <update id="deleteById">
+        update  t_dept set is_valid=1 where id=#{id}
+    </update>
+
+
+    <update id="updatedept">
+        update  t_dept set dept_name=#{deptName},dept_add=#{deptAdd},remark=#{remark} where id=#{id}
+    </update>
+
+
+
+
+</mapper>
