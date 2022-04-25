@@ -14,4 +14,9 @@ public class TestVo {
         System.out.println("33333");
          System.out.println("444444");
     }
+
+    public void test(){
+
+        System.out.println("test");
+    }
 }
